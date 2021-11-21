@@ -57,7 +57,6 @@ import math
 #-------------------------------------------------------------------72->
 log = 2
 mode = 0
-x, y = (0, 0, 0), (0, 0, 0)
 def getmode():
     return "LEFT" if mode == 0 else "RIGHT" if mode == 2 else "MIDDLE" \
         if mode == 1 else "PRIMARY"
@@ -67,9 +66,25 @@ def getboundries():
 def mousemove():
     debug = False
     if debug:
-        return
-    pyautogui.moveTo(x[1], y[1])
+        print(x, y)
+        #return
+    try:
+        pyautogui.moveTo(x[1], y[1])
+    except pyautogui.FailSafeException:
+        print("FailSafeException has occurred. Don't worry be happy.")
+        print("It could be your mouse cursor is on the edge of your screen.")
+        print("So nudge it a bit towards center and press to reset center")
 
+#-------------------------------------------------------------------72->
+x, y = (0, 0, 0), (0, 0, 0)
+def center():
+    global x, y
+    w, h = getboundries()
+    w -= 1; h -= 1
+    x = (0, w//2, w)
+    y = (0, h//2, h)
+
+center()
 
 # v stands for vector, p/q to scale, d for direction
 def scaler(v, d, p=1, q=2):
@@ -97,6 +112,8 @@ def scaler(v, d, p=1, q=2):
     # place b according to the scaling factor and between a, c
     n = c - a + 1
     b = math.floor(a + n * p / q)
+    if debug:
+        print(f"a:{a}  b:{b}  c:{c}")
     return (a, b, c)
 
 def increase(v, log):
@@ -198,18 +215,15 @@ def set_right():
     print("mode is set to "+getmode())
 
 def reset_center():
+    print("reset to center")
     global x, y, log
     debug = False
     if debug:
         a, b, c = (0, 0, 7)
         x = (a, (c - a) // 2, c)
     else:
-        w, h = getboundries()
-        x, y = pyautogui.position()
-        x = (0, w//2, w)
-        y = (0, h//2, h)
+        center()
     mousemove()
-    print("reset to center")
 
 forward_declaration()
 #-------------------------------------------------------------------72->
