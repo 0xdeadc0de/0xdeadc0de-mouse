@@ -68,9 +68,10 @@ def mousemove():
     if debug:
         print(x, y)
         #return
-    try:
-        pyautogui.moveTo(x[1], y[1])
-    except pyautogui.FailSafeException:
+    try: pyautogui.moveTo(x[1], y[1])
+    except pyautogui.FailSafeException: stupidsafe()
+
+def stupidsafe():
         print("FailSafeException has occurred. Don't worry be happy.")
         print("It could be your mouse cursor is on the edge of your screen.")
         print("So nudge it a bit towards center and press to reset center")
@@ -191,13 +192,16 @@ def right_up():
     print("right up")
 
 def click():
-    pyautogui.click(button=getmode())
+    try: pyautogui.click(button=getmode())
+    except pyautogui.FailSafeException: stupidsafe()
 
 def hold_click():
-    pyautogui.mouseDown(button=getmode())
+    try: pyautogui.mouseDown(button=getmode())
+    except pyautogui.FailSafeException: stupidsafe()
 
 def release_click():
-    pyautogui.mouseUp(button=getmode())
+    try: pyautogui.mouseUp(button=getmode())
+    except pyautogui.FailSafeException: stupidsafe()
 
 def set_left(): 
     global mode
