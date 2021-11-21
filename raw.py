@@ -2,6 +2,31 @@
 
 #-------------------------------------------------------------------72->
 # your configuration:
+settings = {}
+def forward_declaration():
+    global settings
+    settings = {
+        "padlock": padlock,
+        "padenter": padenter,
+        "pad1": left_down,
+        "pad2": down,
+        "pad3": right_down,
+        "pad4": left,
+        "pad5": set_origin,
+        "pad6": right,
+        "pad7": left_up,
+        "pad8": up,
+        "pad9": right_up,
+        "pad0": reset_center,
+        "padplus": click,
+    }
+"""
+To findout your keyboard browse /dev/input/ folder and look either by-id/
+or by-path/ folders to locate your keyboard. To verify use
+$ sudo cat /dev/input/YOUR_KEYBOARD
+command to type a key on keyboard and expect to see some random characters
+popping up in the shell screen.
+"""
 keyboards = [
     "/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-kbd",
     "/dev/input/by-id/usb-COMPANY_2.4G_Device-event-kbd"
@@ -79,86 +104,86 @@ def decrease(v, log):
 #-------------------------------------------------------------------72->
 def padenter():
     print(x)
+def padlock(): print("padlock")
 
-def pad1():
+def left_down():
     global x, y, log
     x = decrease(x, log)
     y = increase(y, log)
     mousemove()
     print("left down")
 
-def pad2():
+def down():
     global x, y, log
     y = increase(y, log)
     mousemove()
     print("down")
 
-def pad3():
+def right_down():
     global x, y, log
     x = increase(x, log)
     y = increase(y, log)
     mousemove()
     print("right down")
 
-def pad4():
+def left():
     global x, y, log
     x = decrease(x, log)
     mousemove()
     print("left")
 
-def pad5():
+def set_origin():
     global x, y
     w, h = getboundries()
     x = (0, x[1], w)
     y = (0, y[1], h)
     print("set origin")
 
-def pad6():
+def right():
     global x, y, log
     x = increase(x, log)
     mousemove()
     print("right")
 
-def pad7():
+def left_up():
     global x, y, log
     x = decrease(x, log)
     y = decrease(y, log)
     mousemove()
     print("left up")
 
-def pad8():
+def up():
     global x, y, log
     y = decrease(y, log)
     mousemove()
     print("up")
 
-def pad9():
+def right_up():
     global x, y, log
     x = increase(x, log)
     y = decrease(y, log)
     mousemove()
     print("right up")
 
-def pad0():
+def click():
     pyautogui.click(button=getmode())
 
-def padlock(): print("padlock")
-def padslash(): 
+def set_left(): 
     global mode
     mode = 0
     print("mode is set to "+getmode())
 
-def padstar():
+def set_middle():
     global mode
     mode = 2
     print("mode is set to "+getmode())
 
-def padminus():
+def set_right():
     global mode
     mode = 1
     print("mode is set to "+getmode())
 
-def padplus():
+def reset_center():
     global x, y, log
     debug = False
     if debug:
@@ -172,6 +197,7 @@ def padplus():
     mousemove()
     print("reset to center")
 
+forward_declaration()
 #-------------------------------------------------------------------72->
 justpressed = {}
 def raw(code, value, whatever, keyboard):
@@ -195,22 +221,22 @@ def raw(code, value, whatever, keyboard):
         print(x, y)
 
 def laptop_numlock(value):
-    if value == 69: padlock()
-    elif value == 71: pad7() 
-    elif value == 72: pad8() 
-    elif value == 73: pad9() 
-    elif value == 74: padminus() 
-    elif value == 75: pad4() 
-    elif value == 76: pad5() 
-    elif value == 77: pad6() 
-    elif value == 78: padplus() 
-    elif value == 79: pad1() 
-    elif value == 80: pad2() 
-    elif value == 81: pad3() 
-    elif value == 82: pad0() 
-    elif value == 156: padenter()
-    elif value == 181: padslash()
-    elif value == 55: padstar()
+    if value == 69: settings["padlock"]()
+    elif value == 71: settings["pad7"]() 
+    elif value == 72: settings["pad8"]() 
+    elif value == 73: settings["pad9"]() 
+    elif value == 74: settings["padminus"]() 
+    elif value == 75: settings["pad4"]() 
+    elif value == 76: settings["pad5"]() 
+    elif value == 77: settings["pad6"]() 
+    elif value == 78: settings["padplus"]() 
+    elif value == 79: settings["pad1"]() 
+    elif value == 80: settings["pad2"]() 
+    elif value == 81: settings["pad3"]() 
+    elif value == 82: settings["pad0"]() 
+    elif value == 156: settings["padenter"]()
+    elif value == 181: settings["padslash"]()
+    elif value == 55: settings["padstar"]()
 
 def keyboard_numlock(value):
     # this is the numlock base keycode it starts from numlock and goes like:
@@ -222,22 +248,22 @@ def keyboard_numlock(value):
         return
 
     value -= (b + enter)
-    if value == 0: padenter()
-    elif value == 1: pad1()
-    elif value == 2: pad2()
-    elif value == 3: pad3()
-    elif value == 4: pad4()
-    elif value == 5: pad5()
-    elif value == 6: pad6()
-    elif value == 7: pad7()
-    elif value == 8: pad8()
-    elif value == 9: pad9()
-    elif value == 10: pad0()
-    elif value == -6: padlock()
-    elif value == -4: padslash()
-    elif value == -3: padstar()
-    elif value == -2: padminus()
-    elif value == -1: padplus()
+    if value == 0: settings["padenter"]()
+    elif value == 1: settings["pad1"]()
+    elif value == 2: settings["pad2"]()
+    elif value == 3: settings["pad3"]()
+    elif value == 4: settings["pad4"]()
+    elif value == 5: settings["pad5"]()
+    elif value == 6: settings["pad6"]()
+    elif value == 7: settings["pad7"]()
+    elif value == 8: settings["pad8"]()
+    elif value == 9: settings["pad9"]()
+    elif value == 10: settings["pad0"]()
+    elif value == -6: settings["padlock"]()
+    elif value == -4: settings["padslash"]()
+    elif value == -3: settings["padstar"]()
+    elif value == -2: settings["padminus"]()
+    elif value == -1: settings["padplus"]()
 
 #-------------------------------------------------------------------72->
 FORMAT = 'llHHI'
