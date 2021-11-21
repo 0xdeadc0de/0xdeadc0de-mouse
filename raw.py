@@ -6,19 +6,23 @@ settings = {}
 def forward_declaration():
     global settings
     settings = {
-        "padlock": padlock,
-        "padenter": padenter,
-        "pad1": left_down,
+        "padlock": unassigned,
+        "padenter": unassigned,
+        "pad1": unassigned,
         "pad2": down,
-        "pad3": right_down,
+        "pad3": unassigned,
         "pad4": left,
-        "pad5": set_origin,
+        "pad5": reset_center,
         "pad6": right,
-        "pad7": left_up,
+        "pad7": unassigned,
         "pad8": up,
-        "pad9": right_up,
-        "pad0": reset_center,
+        "pad9": unassigned,
+        "pad0": hold_click,
+        "paddot": release_click,
         "padplus": click,
+        "padminus": set_left,
+        "padstar": set_middle,
+        "padminus": set_right,
     }
 """
 To findout your keyboard browse /dev/input/ folder and look either by-id/
@@ -102,9 +106,13 @@ def decrease(v, log):
     return scaler(v, -1, 1, log)
 
 #-------------------------------------------------------------------72->
-def padenter():
+def print_location():
     print(x)
-def padlock(): print("padlock")
+
+def unassigned():
+    debug = True
+    if debug:
+        print("doom!")
 
 def left_down():
     global x, y, log
@@ -168,6 +176,12 @@ def right_up():
 def click():
     pyautogui.click(button=getmode())
 
+def hold_click():
+    pyautogui.mouseDown(button=getmode())
+
+def release_click():
+    pyautogui.mouseUp(button=getmode())
+
 def set_left(): 
     global mode
     mode = 0
@@ -218,6 +232,7 @@ def raw(code, value, whatever, keyboard):
     
     debug = False
     if debug:
+        print(f"Keycode: {value}")
         print(x, y)
 
 def laptop_numlock(value):
@@ -234,6 +249,7 @@ def laptop_numlock(value):
     elif value == 80: settings["pad2"]() 
     elif value == 81: settings["pad3"]() 
     elif value == 82: settings["pad0"]() 
+    elif value == 83: settings["paddot"]() 
     elif value == 156: settings["padenter"]()
     elif value == 181: settings["padslash"]()
     elif value == 55: settings["padstar"]()
@@ -244,9 +260,6 @@ def keyboard_numlock(value):
 
     b = 458835
     enter= 5
-    if value < b or value > b + enter + 10:
-        return
-
     value -= (b + enter)
     if value == 0: settings["padenter"]()
     elif value == 1: settings["pad1"]()
@@ -259,6 +272,7 @@ def keyboard_numlock(value):
     elif value == 8: settings["pad8"]()
     elif value == 9: settings["pad9"]()
     elif value == 10: settings["pad0"]()
+    elif value == 11: settings["paddot"]()
     elif value == -6: settings["padlock"]()
     elif value == -4: settings["padslash"]()
     elif value == -3: settings["padstar"]()
