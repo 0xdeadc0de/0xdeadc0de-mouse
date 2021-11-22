@@ -20,7 +20,7 @@ def forward_declaration():
         "pad0": hold_click,
         "paddot": release_click,
         "padplus": click,
-        "padminus": set_left,
+        "padslash": set_left,
         "padstar": set_middle,
         "padminus": set_right,
     }
