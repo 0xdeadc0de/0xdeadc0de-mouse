@@ -24,57 +24,47 @@ def forward_declaration():
         "padstar": set_middle,
         "padminus": set_right,
     }
-"""
-To findout your keyboard browse /dev/input/ folder and look either by-id/
-or by-path/ folders to locate your keyboard. To verify use
-$ sudo cat /dev/input/YOUR_KEYBOARD
-command to type a key on keyboard and expect to see some random characters
-popping up in the shell screen.
-"""
-keyboards = [
-    "/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-kbd",
-    "/dev/input/by-id/usb-COMPANY_2.4G_Device-event-kbd"
-]
-laptops = [
-    "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
-]
-"""
-For arch/linux:
-to run: sudo python this.py
-to install:
-    sudo python -m pip install pyautogui
-    sudo pacman -S tk
-
-if xliberrors with authorization, you may need to execute the following command:
-$ xhost +
-"""
 #-------------------------------------------------------------------72->
-import pyautogui
-import struct
 import sys
 import math
-
+from PyQt5 import QtWidgets
+from pynput import keyboard
+from pynput.mouse import Button, Controller
+mouse = Controller()
 #-------------------------------------------------------------------72->
 log = 2
 mode = 0
 def getmode():
-    return "LEFT" if mode == 0 else "RIGHT" if mode == 2 else "MIDDLE" \
-        if mode == 1 else "PRIMARY"
+    from pynput.mouse import Button
+    return Button.left if mode == 0 else Button.middle if mode == 1 else \
+        Button.right if mode == 2 else Button.left
 def getboundries():
-    w, h = pyautogui.size()
+    global app
+    rect = app.primaryScreen().availableGeometry()
+    w, h = rect.width(), rect.height()
     return (w, h)
+
 def mousemove():
     debug = False
     if debug:
         print(x, y)
         #return
-    try: pyautogui.moveTo(x[1], y[1])
-    except pyautogui.FailSafeException: stupidsafe()
+    global mouse
+    try: mouse.position = (x[1], y[1])
+    except: print("error") 
 
-def stupidsafe():
-        print("FailSafeException has occurred. Don't worry be happy.")
-        print("It could be your mouse cursor is on the edge of your screen.")
-        print("So nudge it a bit towards center and press to reset center")
+def qt():
+    global app
+    app = QtWidgets.QApplication(sys.argv)
+
+    screen = app.primaryScreen()
+    print('Screen: %s' % screen.name())
+    size = screen.size()
+    print('Size: %d x %d' % (size.width(), size.height()))
+    rect = screen.availableGeometry()
+    print('Available: %d x %d' % (rect.width(), rect.height()))
+
+    app.exec()
 
 #-------------------------------------------------------------------72->
 x, y = (0, 0, 0), (0, 0, 0)
@@ -84,8 +74,6 @@ def center():
     w -= 1; h -= 1
     x = (0, w//2, w)
     y = (0, h//2, h)
-
-center()
 
 # v stands for vector, p/q to scale, d for direction
 def scaler(v, d, p=1, q=2):
@@ -192,16 +180,17 @@ def right_up():
     print("right up")
 
 def click():
-    try: pyautogui.click(button=getmode())
-    except pyautogui.FailSafeException: stupidsafe()
+    mouse.press(getmode())
+    mouse.release(getmode())
+    #try: pyautogui.click(button=getmode())
+    #except pyautogui.FailSafeException: stupidsafe()
 
 def hold_click():
-    try: pyautogui.mouseDown(button=getmode())
-    except pyautogui.FailSafeException: stupidsafe()
+    mouse.press(getmode())
+    
 
 def release_click():
-    try: pyautogui.mouseUp(button=getmode())
-    except pyautogui.FailSafeException: stupidsafe()
+    mouse.release(getmode())
 
 def set_left(): 
     global mode
@@ -231,97 +220,36 @@ def reset_center():
 
 forward_declaration()
 #-------------------------------------------------------------------72->
-justpressed = {}
-def raw(code, value, whatever, keyboard):
-    if (code != 4):
-        return
-    global justpressed
-    if not keyboard in justpressed:
-        justpressed[keyboard] = []
-    if not value in justpressed[keyboard]:
-        justpressed[keyboard].append(value)
-        return
-    justpressed[keyboard].remove(value)
+def key_on_release(key):
+    vk = None
+    char = None
+    try: vk = key.vk
+    except: pass
+    try: char = key.char
+    except: pass
+    print(vk, char, sep=" ")
 
-    if keyboard in keyboards:
-        keyboard_numlock(value)
-    elif keyboard in laptops:
-        laptop_numlock(value)
-    
-    debug = False
-    if debug:
-        print(f"Keycode: {value}")
-        print(x, y)
+    #settings["padenter"]()
+    if char == "1": settings["pad1"]()
+    elif char == "2": settings["pad2"]()
+    elif char == "3": settings["pad3"]()
+    elif char == "4": settings["pad4"]()
+    elif vk == 65437: settings["pad5"]()
+    elif char == "6": settings["pad6"]()
+    elif char == "7":settings["pad7"]()
+    elif char == "8":settings["pad8"]()
+    elif char == "9":settings["pad9"]()
+    elif char == "0":settings["pad0"]()
+    elif char == ".":settings["paddot"]()
+    #settings["padlock"]()
+    elif char == "/":settings["padslash"]()
+    elif char == "*":settings["padstar"]()
+    elif char == "-":settings["padminus"]()
+    elif char == "+":settings["padplus"]()
 
-def laptop_numlock(value):
-    if value == 69: settings["padlock"]()
-    elif value == 71: settings["pad7"]() 
-    elif value == 72: settings["pad8"]() 
-    elif value == 73: settings["pad9"]() 
-    elif value == 74: settings["padminus"]() 
-    elif value == 75: settings["pad4"]() 
-    elif value == 76: settings["pad5"]() 
-    elif value == 77: settings["pad6"]() 
-    elif value == 78: settings["padplus"]() 
-    elif value == 79: settings["pad1"]() 
-    elif value == 80: settings["pad2"]() 
-    elif value == 81: settings["pad3"]() 
-    elif value == 82: settings["pad0"]() 
-    elif value == 83: settings["paddot"]() 
-    elif value == 156: settings["padenter"]()
-    elif value == 181: settings["padslash"]()
-    elif value == 55: settings["padstar"]()
+listener = keyboard.Listener(
+    #on_press=key_on_press,
+    on_release=key_on_release)
+listener.start()
 
-def keyboard_numlock(value):
-    # this is the numlock base keycode it starts from numlock and goes like:
-    # numlock / * - + enter 1 2 3 4 5 6 7 8 9 0 .
-
-    b = 458835
-    enter= 5
-    value -= (b + enter)
-    if value == 0: settings["padenter"]()
-    elif value == 1: settings["pad1"]()
-    elif value == 2: settings["pad2"]()
-    elif value == 3: settings["pad3"]()
-    elif value == 4: settings["pad4"]()
-    elif value == 5: settings["pad5"]()
-    elif value == 6: settings["pad6"]()
-    elif value == 7: settings["pad7"]()
-    elif value == 8: settings["pad8"]()
-    elif value == 9: settings["pad9"]()
-    elif value == 10: settings["pad0"]()
-    elif value == 11: settings["paddot"]()
-    elif value == -6: settings["padlock"]()
-    elif value == -4: settings["padslash"]()
-    elif value == -3: settings["padstar"]()
-    elif value == -2: settings["padminus"]()
-    elif value == -1: settings["padplus"]()
-
-#-------------------------------------------------------------------72->
-FORMAT = 'llHHI'
-EVENT_SIZE = struct.calcsize(FORMAT)
-
-def watch(X):
-    infile_path = X
-    in_file = open(infile_path, "rb")
-
-    event = in_file.read(EVENT_SIZE)
-
-    while event:
-        (tv_sec, tv_usec, type, code, value) = struct.unpack(FORMAT, event)
-
-        if type != 0 or code != 0 or value != 0:
-            raw(code, value, (tv_sec, tv_usec, type), X)
-
-        event = in_file.read(EVENT_SIZE)
-
-    in_file.close()
-import threading
-ts=[]
-for k in keyboards+laptops:
-    print(k)
-    t=threading.Thread(target=watch, args=(k,))
-    t.start()
-    ts.append(t)
-for t in ts:
-    t.join()
+qt()
