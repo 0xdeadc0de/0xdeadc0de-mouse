@@ -1,4 +1,6 @@
 from static import print_verbose
+from panel import is_disabled
+
 #-------------------------------------------------------------------72->
 
 def released(key, bindings):
@@ -23,7 +25,7 @@ def released(key, bindings):
     # are keys that can send a char or such a key that perform an action like
     # enter key. in order to prevent these happening, we require user to have
     # his/her panel had opened
-    if enabled == False:
+    if is_disabled():
         return
 
     #settings["padenter"]()

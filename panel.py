@@ -43,6 +43,10 @@ class Panel(QtWidgets.QMainWindow):
         self.label.setPixmap(self.canvas)
         self.update()
 
+enabled = False
+def is_disabled():
+    return enabled == False
+
 panel = Panel()
 
 def draw(x, y):
